@@ -10,7 +10,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <Sidebar />
-      <div className="flex-1 flex">
+      <div className="flex-1 flex shadow-xl rounded-l-2xl overflow-hidden bg-white">
         <InboxContent 
           selectedConversation={selectedConversation}
           onSelectConversation={setSelectedConversation}
