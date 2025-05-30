@@ -21,7 +21,7 @@ const sidebarItems = [
 
 export const Sidebar = () => {
   return (
-    <div className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-6 space-y-8">
+    <div className="w-16 flex flex-col items-center py-6 space-y-8" style={{ backgroundColor: '#28244c' }}>
       {/* Logo */}
       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
         <div className="w-4 h-4 bg-white rounded-sm transform rotate-45"></div>
@@ -34,16 +34,16 @@ export const Sidebar = () => {
           return (
             <button
               key={index}
-              className={`group relative p-3 rounded-xl transition-all duration-300 hover:bg-gray-50 ${
+              className={`group relative p-3 rounded-xl transition-all duration-300 hover:bg-white/10 ${
                 item.active 
-                  ? 'bg-blue-50 text-blue-600 shadow-md border border-blue-100' 
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-white/20 text-white shadow-md' 
+                  : 'text-white/60 hover:text-white'
               }`}
               title={item.name}
             >
               <Icon size={20} className="transition-transform group-hover:scale-110" />
               {item.active && (
-                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-full"></div>
+                <div className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-white rounded-full"></div>
               )}
             </button>
           );
