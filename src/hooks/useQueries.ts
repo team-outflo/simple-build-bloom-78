@@ -31,12 +31,10 @@ export const useConversationsQuery = (
         selectedAccountIds,
         selectedAnswerStatus,
       );
+      setSearchLoading?.(false);
       return response.conversations;
     },
     refetchInterval: 7000,
-    onSuccess: () => {
-      setSearchLoading?.(false);
-    },
   });
 };
 

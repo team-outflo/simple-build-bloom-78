@@ -7,53 +7,69 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const accounts = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    initials: "SJ",
-    status: "Not connected",
-    statusColor: "bg-red-100 text-red-600",
-    limits: {
-      daily: 25,
-      weekly: 40,
-      monthly: 40
-    }
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    initials: "MC",
-    status: "Not connected",
-    statusColor: "bg-red-100 text-red-600",
-    limits: {
-      daily: 25,
-      weekly: 40,
-      monthly: 40
-    }
-  },
-  {
-    id: 3,
-    name: "DEV PRASHTRIP...",
-    initials: "DP",
-    status: "In 1 campaign",
-    statusColor: "bg-blue-100 text-blue-600",
-    limits: {
-      daily: 25,
-      weekly: 40,
-      monthly: 40
-    }
-  }
-];
+import { useAccountsQuery } from "@/hooks/useAccountQueries";
+import { SyncState } from "@/types/accounts";
 
 const Accounts = () => {
   const [isLeftSidebarExpanded, setIsLeftSidebarExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  
+  const { data: accounts = [], isLoading, error } = useAccountsQuery();
 
   const handleSidebarToggle = (expanded: boolean) => {
     setIsLeftSidebarExpanded(expanded);
   };
+
+  const filteredAccounts = accounts.filter(account => {
+    const matchesSearch = `${account.firstName} ${account.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "connected" && account.status === SyncState.ACTIVE) ||
+      (statusFilter === "disconnected" && account.status === SyncState.INACTIVE);
+    
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusInfo = (account: any) => {
+    if (account.status === SyncState.ACTIVE) {
+      return {
+        text: "In 1 campaign",
+        className: "bg-blue-100 text-blue-600"
+      };
+    }
+    return {
+      text: "Not connected",
+      className: "bg-red-100 text-red-600"
+    };
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar 
+          isExpanded={isLeftSidebarExpanded}
+          onToggle={handleSidebarToggle}
+        />
+        <div className="flex-1 bg-white flex items-center justify-center">
+          <div className="text-gray-500">Loading accounts...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar 
+          isExpanded={isLeftSidebarExpanded}
+          onToggle={handleSidebarToggle}
+        />
+        <div className="flex-1 bg-white flex items-center justify-center">
+          <div className="text-red-500">Error loading accounts</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -117,8 +133,8 @@ const Accounts = () => {
                   className="pl-9 w-48 h-8 text-sm"
                 />
               </div>
-              <Select defaultValue="all">
-                <SelectTrigger className="w-24 h-8 text-sm">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-32 h-8 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -153,60 +169,66 @@ const Accounts = () => {
             </div>
 
             {/* Table Rows */}
-            {accounts.map((account) => (
-              <div key={account.id} className="grid grid-cols-4 gap-4 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                <div className="flex items-center space-x-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback className="bg-purple-100 text-purple-600 font-semibold text-xs">
-                      {account.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium text-gray-900 text-sm">{account.name}</span>
-                </div>
-                
-                <div>
-                  <Badge className={`${account.statusColor} text-xs`}>
-                    {account.status}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center space-x-3 text-xs text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <span className="text-gray-500">📤</span>
-                    <span>{account.limits.daily}/day</span>
+            {filteredAccounts.map((account) => {
+              const initials = `${account.firstName[0]}${account.lastName[0]}`;
+              const fullName = `${account.firstName} ${account.lastName}`;
+              const statusInfo = getStatusInfo(account);
+
+              return (
+                <div key={account.id} className="grid grid-cols-4 gap-4 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="w-8 h-8">
+                      <AvatarFallback className="bg-purple-100 text-purple-600 font-semibold text-xs">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-gray-900 text-sm">{fullName}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-gray-500">📅</span>
-                    <span>{account.limits.weekly}/day</span>
+                  
+                  <div>
+                    <Badge className={`${statusInfo.className} text-xs`}>
+                      {statusInfo.text}
+                    </Badge>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="text-gray-500">👥</span>
-                    <span>{account.limits.monthly}/day</span>
+                  
+                  <div className="flex items-center space-x-3 text-xs text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <span className="text-gray-500">📤</span>
+                      <span>25/day</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="text-gray-500">📅</span>
+                      <span>40/day</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <span className="text-gray-500">👥</span>
+                      <span>40/day</span>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="flex items-center justify-end space-x-2">
-                  {account.status === "Not connected" ? (
-                    <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50 h-7 text-xs">
-                      Re-connect
+                  
+                  <div className="flex items-center justify-end space-x-2">
+                    {account.status === SyncState.INACTIVE ? (
+                      <Button variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50 h-7 text-xs">
+                        Re-connect
+                      </Button>
+                    ) : (
+                      <Button variant="outline" size="sm" className="h-7 text-xs">
+                        <Settings size={10} className="mr-1" />
+                        Configure limits
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                      <MoreHorizontal size={12} />
                     </Button>
-                  ) : (
-                    <Button variant="outline" size="sm" className="h-7 text-xs">
-                      <Settings size={10} className="mr-1" />
-                      Configure limits
-                    </Button>
-                  )}
-                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                    <MoreHorizontal size={12} />
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Footer */}
           <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
-            <span>Showing 1-3 of 3</span>
+            <span>Showing 1-{filteredAccounts.length} of {filteredAccounts.length}</span>
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="sm" disabled className="h-7 text-xs">
                 Previous

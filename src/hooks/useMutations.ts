@@ -7,9 +7,10 @@ import { postMessage, campaignMessage } from "@/api/inbox";
 export const usePostMessage = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<GenericApiResponse, { conversationId: string; text: string }>({
+  return useMutation({
     mutationKey: ["postMessage"],
-    mutationFn: async ({ conversationId, text }) => await postMessage(conversationId, text),
+    mutationFn: async ({ conversationId, text }: { conversationId: string; text: string }) => 
+      await postMessage(conversationId, text),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
@@ -26,9 +27,10 @@ export const usePostMessage = () => {
 export const useCampaignMessage = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<GenericApiResponse, { senderURN: string, url: string, message: string }>({
+  return useMutation({
     mutationKey: ["campaignMessage"],
-    mutationFn: async ({ senderURN, url, message }) => await campaignMessage(senderURN, url, message),
+    mutationFn: async ({ senderURN, url, message }: { senderURN: string, url: string, message: string }) => 
+      await campaignMessage(senderURN, url, message),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
