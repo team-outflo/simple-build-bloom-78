@@ -1,18 +1,26 @@
 
 import { useState } from "react";
-import { Search, Filter, Star, Bell } from "lucide-react";
+import { Search, Filter, Star, Bell, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ConversationList } from "@/components/ConversationList";
 import { InboxFiltersDialog } from "@/components/InboxFiltersDialog";
 
 interface InboxContentProps {
   selectedConversation: any;
   onSelectConversation: (conversation: any) => void;
+  onProfilePreview: (conversation: any) => void;
 }
 
-export const InboxContent = ({ selectedConversation, onSelectConversation }: InboxContentProps) => {
+const activeAccounts = [
+  { id: 1, name: "Sarah Johnson", initials: "SJ", status: "active" },
+  { id: 2, name: "Michael Chen", initials: "MC", status: "active" },
+  { id: 3, name: "Dev Prashtrip", initials: "DP", status: "active" },
+];
+
+export const InboxContent = ({ selectedConversation, onSelectConversation, onProfilePreview }: InboxContentProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -79,7 +87,7 @@ export const InboxContent = ({ selectedConversation, onSelectConversation }: Inb
           )}
 
           {/* Enhanced Filter Tabs */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-4">
             {filters.map((filter) => (
               <Button
                 key={filter.name}
@@ -107,6 +115,33 @@ export const InboxContent = ({ selectedConversation, onSelectConversation }: Inb
                 )}
               </Button>
             ))}
+          </div>
+
+          {/* Active Accounts Section */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-700">Active Accounts</h3>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                <MoreHorizontal size={14} className="text-gray-400" />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              {activeAccounts.map((account) => (
+                <div key={account.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <Avatar className="w-6 h-6">
+                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs font-medium">
+                      {account.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-gray-700 flex-1">{account.name}</span>
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                </div>
+              ))}
+              <Button variant="ghost" size="sm" className="w-full justify-start text-gray-500 hover:text-gray-700">
+                <MoreHorizontal size={14} className="mr-2" />
+                View all accounts
+              </Button>
+            </div>
           </div>
         </div>
 
