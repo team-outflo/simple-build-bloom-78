@@ -31,7 +31,11 @@ const Index = () => {
         isExpanded={isLeftSidebarExpanded}
         onToggle={handleSidebarToggle}
       />
-      <div className="flex-1 flex shadow-xl rounded-l-2xl overflow-hidden bg-white">
+      <div 
+        className={`flex-1 flex shadow-xl rounded-l-2xl overflow-hidden bg-white transition-all duration-300 ${
+          isProfileSidebarOpen ? 'mr-80' : 'mr-0'
+        }`}
+      >
         <InboxContent 
           selectedConversation={selectedConversation}
           onSelectConversation={setSelectedConversation}
