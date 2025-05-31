@@ -47,21 +47,21 @@ export default function Leads() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-full bg-slate-900 text-white">
       {/* Header */}
-      <div className="bg-slate-800 px-6 py-4">
+      <div className="bg-slate-800 px-6 py-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-blue-400 text-sm">
             <span>⚠️</span>
             <span>Your campaigns are not operating since they're outside of working hours at the moment.</span>
-            <button className="text-blue-400 underline">Adjust my schedule</button>
+            <button className="text-blue-400 underline hover:text-blue-300">Adjust my schedule</button>
           </div>
         </div>
         
         <div className="flex gap-6 mt-4">
-          <button className="text-white border-b-2 border-white pb-2">Add Leads</button>
-          <button className="text-slate-400 pb-2">Create a Sequence</button>
-          <button className="text-slate-400 pb-2">Settings</button>
+          <button className="text-white border-b-2 border-white pb-2 font-medium">Add Leads</button>
+          <button className="text-slate-400 pb-2 hover:text-slate-300">Create a Sequence</button>
+          <button className="text-slate-400 pb-2 hover:text-slate-300">Settings</button>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export default function Leads() {
           <h1 className="text-2xl font-semibold mb-8 text-white">Lists of leads</h1>
           
           <div className="mb-8">
-            <Card className="bg-slate-800 border-slate-700 p-8">
+            <Card className="bg-slate-800 border-slate-700 p-8 shadow-lg">
               <CardContent className="p-0">
                 <div className="mb-6">
                   <div className="relative">
@@ -92,7 +92,7 @@ export default function Leads() {
                       </div>
                     </div>
                     <div className="absolute -bottom-2 -right-2">
-                      <div className="bg-green-500 rounded-full p-2">
+                      <div className="bg-green-500 rounded-full p-2 shadow-lg">
                         <CirclePlus className="h-6 w-6 text-white" />
                       </div>
                     </div>
@@ -105,7 +105,7 @@ export default function Leads() {
                 
                 <Button 
                   onClick={() => setShowAddModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add leads
                 </Button>

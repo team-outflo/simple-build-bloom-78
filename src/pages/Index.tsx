@@ -2,72 +2,52 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { InboxContent } from "@/components/InboxContent";
 
 export default function Index() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">LinkedIn CRM</h1>
-            <div className="flex gap-4">
-              <Link to="/">
-                <Button variant="ghost">Inbox</Button>
-              </Link>
-              <Link to="/accounts">
-                <Button variant="ghost">Accounts</Button>
-              </Link>
-              <Link to="/leads">
-                <Button variant="ghost">Leads</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-full bg-slate-900 text-white">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">LinkedIn CRM Dashboard</h1>
+          <p className="text-slate-400">Manage your LinkedIn connections and campaigns</p>
+        </div>
+
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
+          <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Quick Actions</CardTitle>
+              <CardDescription className="text-slate-400">
                 Get started with common tasks
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Link to="/accounts">
-                <Button className="w-full justify-start" variant="outline">
+                <Button className="w-full justify-start bg-slate-700 hover:bg-slate-600 text-white border-slate-600" variant="outline">
                   Manage Accounts
                 </Button>
               </Link>
               <Link to="/leads">
-                <Button className="w-full justify-start" variant="outline">
+                <Button className="w-full justify-start bg-slate-700 hover:bg-slate-600 text-white border-slate-600" variant="outline">
                   Add Leads
                 </Button>
               </Link>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-slate-800 border-slate-700">
             <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-white">Recent Activity</CardTitle>
+              <CardDescription className="text-slate-400">
                 Latest updates and messages
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-slate-400">
                 No recent activity to display.
               </p>
             </CardContent>
           </Card>
-        </div>
-
-        <div className="mt-8">
-          <InboxContent />
         </div>
       </div>
     </div>

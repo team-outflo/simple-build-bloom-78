@@ -50,14 +50,14 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white">
-        <DialogHeader className="border-b pb-4">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700 text-white">
+        <DialogHeader className="border-b border-slate-700 pb-4">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-blue-500 hover:text-blue-600"
+              className="text-blue-400 hover:text-blue-300 hover:bg-slate-800"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Choose another method
@@ -66,20 +66,20 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
         </DialogHeader>
 
         <div className="py-6">
-          <h2 className="text-2xl font-semibold mb-8">Upload CSV File</h2>
+          <h2 className="text-2xl font-semibold mb-8 text-white">Upload CSV File</h2>
           
           {/* File Info */}
-          <div className="border border-gray-200 rounded-lg p-4 mb-6 bg-gray-50">
+          <div className="border border-slate-600 rounded-lg p-4 mb-6 bg-slate-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="text-gray-600 text-sm">{csvData.fileSize}</div>
-                <div className="font-medium">{csvData.fileName}</div>
+                <div className="text-slate-400 text-sm">{csvData.fileSize}</div>
+                <div className="font-medium text-white">{csvData.fileName}</div>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="mt-2 flex items-center gap-2 text-green-600 text-sm">
+            <div className="mt-2 flex items-center gap-2 text-green-400 text-sm">
               <CheckCircle className="h-4 w-4" />
               File processed
             </div>
@@ -87,7 +87,7 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
 
           {/* Column Mapping */}
           <div className="space-y-6">
-            <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-600 border-b pb-2">
+            <div className="grid grid-cols-3 gap-4 text-sm font-medium text-slate-400 border-b border-slate-700 pb-2">
               <div>Column Name</div>
               <div>Select Type</div>
               <div>Samples</div>
@@ -95,18 +95,18 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
 
             {csvData.columns.map((column) => (
               <div key={column.name} className="grid grid-cols-3 gap-4 items-start">
-                <div className="font-medium">{column.name}</div>
+                <div className="font-medium text-white">{column.name}</div>
                 <div>
                   <Select
                     value={columnMappings[column.name]}
                     onValueChange={(value: ColumnType) => handleColumnTypeChange(column.name, value)}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full bg-slate-800 border-slate-600 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-slate-800 border-slate-600">
                       {columnTypeOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value} className="text-white hover:bg-slate-700">
                           <div className="flex items-center gap-2">
                             {option.icon && <span>{option.icon}</span>}
                             <span>{option.label}</span>
@@ -118,7 +118,7 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
                 </div>
                 <div className="space-y-1">
                   {column.samples.slice(0, 4).map((sample, idx) => (
-                    <div key={idx} className="text-sm text-gray-600">
+                    <div key={idx} className="text-sm text-slate-400">
                       {sample.length > 50 ? `${sample.substring(0, 50)}...` : sample}
                     </div>
                   ))}
@@ -129,31 +129,31 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
 
           {/* Options */}
           <div className="mt-8 space-y-4">
-            <div className="text-lg font-medium">Check for duplicates across all</div>
+            <div className="text-lg font-medium text-white">Check for duplicates across all</div>
             <div className="flex gap-6">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="campaigns"
                   checked={checkCampaigns}
-                  onCheckedChange={setCheckCampaigns}
+                  onCheckedChange={(checked) => setCheckCampaigns(checked === true)}
                 />
-                <label htmlFor="campaigns" className="text-sm">Campaigns</label>
+                <label htmlFor="campaigns" className="text-sm text-slate-300">Campaigns</label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="lists"
                   checked={checkLists}
-                  onCheckedChange={setCheckLists}
+                  onCheckedChange={(checked) => setCheckLists(checked === true)}
                 />
-                <label htmlFor="lists" className="text-sm">Lists</label>
+                <label htmlFor="lists" className="text-sm text-slate-300">Lists</label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="workspace"
                   checked={checkWorkspace}
-                  onCheckedChange={setCheckWorkspace}
+                  onCheckedChange={(checked) => setCheckWorkspace(checked === true)}
                 />
-                <label htmlFor="workspace" className="text-sm">The Workspace</label>
+                <label htmlFor="workspace" className="text-sm text-slate-300">The Workspace</label>
               </div>
             </div>
 
@@ -161,21 +161,21 @@ export function CSVMappingModal({ open, onClose, onBack, csvData, onUpload }: CS
               <Checkbox
                 id="verify"
                 checked={verifyLeads}
-                onCheckedChange={setVerifyLeads}
+                onCheckedChange={(checked) => setVerifyLeads(checked === true)}
               />
-              <label htmlFor="verify" className="text-sm">Verify leads</label>
-              <span className="text-sm text-yellow-600">⚡ 0.25 / Row</span>
+              <label htmlFor="verify" className="text-sm text-slate-300">Verify leads</label>
+              <span className="text-sm text-yellow-400">⚡ 0.25 / Row</span>
             </div>
           </div>
 
           {/* Summary */}
-          <div className="mt-8 flex items-center gap-2 text-green-600">
+          <div className="mt-8 flex items-center gap-2 text-green-400">
             <CheckCircle className="h-5 w-5" />
             <span>Detected {csvData.rowCount} data rows</span>
           </div>
         </div>
 
-        <div className="flex justify-center border-t pt-4">
+        <div className="flex justify-center border-t border-slate-700 pt-4">
           <Button
             onClick={onUpload}
             className="bg-green-500 hover:bg-green-600 text-white px-8 py-3 text-lg"

@@ -77,7 +77,7 @@ export function AddLeadsModal({ open, onClose, onSelectSource }: AddLeadsModalPr
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-slate-900 border-slate-700 text-white">
+      <DialogContent className="max-w-5xl bg-slate-900 border-slate-700 text-white">
         <DialogHeader className="border-b border-slate-700 pb-4">
           <div className="flex items-center gap-4">
             <DialogTitle className="text-white text-lg">
