@@ -1,19 +1,56 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send, Plus, MoreHorizontal, Star, Settings, Paperclip, Mic } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { Conversation, ConversationDetail, Message } from "@/types/inbox";
+import { getMessages, postMessage } from "@/api/inbox";
 
 interface ConversationViewProps {
-  conversation: any;
+  conversation: Conversation | null;
   onClose: () => void;
-  onProfilePreview: (conversation: any) => void;
+  onProfilePreview: (conversation: Conversation) => void;
 }
 
 export const ConversationView = ({ conversation, onProfilePreview }: ConversationViewProps) => {
   const [message, setMessage] = useState("");
+  const [conversationDetail, setConversationDetail] = useState<ConversationDetail | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (conversation) {
+      const fetchMessages = async () => {
+        try {
+          setLoading(true);
+          const response = await getMessages(conversation.id);
+          setConversationDetail(response.conversation);
+        } catch (error) {
+          console.error("Failed to fetch messages:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchMessages();
+    }
+  }, [conversation]);
+
+  const handleSendMessage = async () => {
+    if (!message.trim() || !conversation) return;
+
+    try {
+      await postMessage(conversation.id, message);
+      setMessage("");
+      
+      // Refresh messages after sending
+      const response = await getMessages(conversation.id);
+      setConversationDetail(response.conversation);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
+  };
 
   const handleEmojiSelect = (emoji: string) => {
     setMessage(prev => prev + emoji);
@@ -42,22 +79,17 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
     );
   }
 
-  const messages = [
-    {
-      id: 1,
-      sender: "You",
-      content: "Hi Sampath,\nThanks for connecting!",
-      time: "6:54 PM",
-      isOwn: true
-    },
-    {
-      id: 2,
-      sender: "Sampath Goud",
-      content: "Hi, Hrishikesh",
-      time: "7:42 PM",
-      isOwn: false
-    }
-  ];
+  const primaryAccount = conversation.accounts[0];
+  const fullName = `${primaryAccount.firstName} ${primaryAccount.lastName}`;
+  const initials = `${primaryAccount.firstName[0]}${primaryAccount.lastName[0]}`;
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-white">
+        <div className="text-gray-500">Loading messages...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-white">
@@ -67,16 +99,16 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
           <div className="flex items-center space-x-4">
             <Avatar className="w-12 h-12 ring-2 ring-blue-100">
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
-                {conversation.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
+                {initials}
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="flex items-center space-x-3">
-                <h3 className="font-bold text-gray-900 text-lg">{conversation.name}</h3>
+                <h3 className="font-bold text-gray-900 text-lg">{fullName}</h3>
                 <Star size={16} className="text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors" />
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
               </div>
-              <p className="text-sm text-gray-600 font-medium">{conversation.location}</p>
+              <p className="text-sm text-gray-600 font-medium">LinkedIn Connection</p>
               <p className="text-xs text-gray-500 flex items-center space-x-1">
                 <span>Origin: Profile Connections</span>
                 <span>•</span>
@@ -110,24 +142,28 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
       <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50">
         <div className="text-center">
           <span className="text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full border border-blue-200 font-medium">
-            Tuesday, 6:54 p.m.
+            {conversationDetail ? new Date(conversationDetail.createdAt).toLocaleDateString() : 'Today'}
           </span>
         </div>
 
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${
-              msg.isOwn 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-white text-gray-900 border border-gray-200'
-            }`}>
-              <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
-              <div className={`text-xs mt-2 ${msg.isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
-                {msg.time}
+        {conversationDetail?.messages.map((msg: Message) => {
+          const isOwn = msg.senderUrn !== primaryAccount.urn;
+          
+          return (
+            <div key={msg.urn} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${
+                isOwn 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-white text-gray-900 border border-gray-200'
+              }`}>
+                <div className="whitespace-pre-wrap font-medium">{msg.text}</div>
+                <div className={`text-xs mt-2 ${isOwn ? 'text-blue-100' : 'text-gray-500'}`}>
+                  {new Date(msg.sentAt).toLocaleTimeString()}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Enhanced Message Input */}
@@ -138,6 +174,7 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
               placeholder="Write your message here..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
               className="pr-24 border-gray-300 focus:border-blue-500 focus:ring-blue-500 bg-gray-50 rounded-xl py-3"
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
@@ -152,6 +189,8 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
           </div>
           <Button 
             size="sm" 
+            onClick={handleSendMessage}
+            disabled={!message.trim()}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-sm"
           >
             <Send size={16} className="mr-2" />

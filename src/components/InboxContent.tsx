@@ -7,11 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ConversationList } from "@/components/ConversationList";
 import { InboxFiltersDialog } from "@/components/InboxFiltersDialog";
+import { Conversation } from "@/types/inbox";
 
 interface InboxContentProps {
-  selectedConversation: any;
-  onSelectConversation: (conversation: any) => void;
-  onProfilePreview: (conversation: any) => void;
+  selectedConversation: Conversation | null;
+  onSelectConversation: (conversation: Conversation) => void;
+  onProfilePreview: (conversation: Conversation) => void;
 }
 
 const activeAccounts = [

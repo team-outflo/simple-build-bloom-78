@@ -4,14 +4,15 @@ import { Sidebar } from "@/components/Sidebar";
 import { InboxContent } from "@/components/InboxContent";
 import { ConversationView } from "@/components/ConversationView";
 import { ProfileSidebar } from "@/components/ProfileSidebar";
+import { Conversation } from "@/types/inbox";
 
 const Index = () => {
-  const [selectedConversation, setSelectedConversation] = useState<any>(null);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [isLeftSidebarExpanded, setIsLeftSidebarExpanded] = useState(true);
   const [isProfileSidebarOpen, setIsProfileSidebarOpen] = useState(false);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<Conversation | null>(null);
 
-  const handleProfilePreview = (conversation: any) => {
+  const handleProfilePreview = (conversation: Conversation) => {
     setProfileData(conversation);
     setIsProfileSidebarOpen(true);
   };
