@@ -1,10 +1,9 @@
 
-import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Conversation } from "@/types/inbox";
-import { getConversations } from "@/api/inbox";
+import { useConversationsQuery } from "@/hooks/useQueries";
 
 interface ConversationListProps {
   searchTerm: string;
@@ -19,24 +18,10 @@ export const ConversationList = ({
   selectedConversation, 
   onSelectConversation 
 }: ConversationListProps) => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        setLoading(true);
-        const response = await getConversations([], searchTerm, false);
-        setConversations(response.conversations);
-      } catch (error) {
-        console.error("Failed to fetch conversations:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchConversations();
-  }, [searchTerm]);
+  const { data: conversations = [], isLoading: loading, error } = useConversationsQuery(
+    false, 
+    searchTerm
+  );
 
   const filteredConversations = conversations.filter(conv => {
     if (activeFilter === "Unread") return true; // Add unread logic when available
@@ -48,6 +33,14 @@ export const ConversationList = ({
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="text-gray-500">Loading conversations...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="text-red-500">Error loading conversations</div>
       </div>
     );
   }
@@ -104,7 +97,6 @@ export const ConversationList = ({
                 </div>
                 
                 <p className="text-xs text-gray-500 truncate mb-2 font-medium">
-                  {/* Location would come from additional account data */}
                   LinkedIn Connection
                 </p>
                 

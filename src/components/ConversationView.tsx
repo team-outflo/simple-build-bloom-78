@@ -1,12 +1,13 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Send, Plus, MoreHorizontal, Star, Settings, Paperclip, Mic } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
-import { Conversation, ConversationDetail, Message } from "@/types/inbox";
-import { getMessages, postMessage } from "@/api/inbox";
+import { Conversation, Message } from "@/types/inbox";
+import { useMessagesQuery } from "@/hooks/useQueries";
+import { usePostMessage } from "@/hooks/useMutations";
+import { useToast } from "@/hooks/use-toast";
 
 interface ConversationViewProps {
   conversation: Conversation | null;
@@ -16,39 +17,31 @@ interface ConversationViewProps {
 
 export const ConversationView = ({ conversation, onProfilePreview }: ConversationViewProps) => {
   const [message, setMessage] = useState("");
-  const [conversationDetail, setConversationDetail] = useState<ConversationDetail | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (conversation) {
-      const fetchMessages = async () => {
-        try {
-          setLoading(true);
-          const response = await getMessages(conversation.id);
-          setConversationDetail(response.conversation);
-        } catch (error) {
-          console.error("Failed to fetch messages:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchMessages();
-    }
-  }, [conversation]);
+  const { toast } = useToast();
+  
+  const { data: conversationDetail, isLoading: loading, error } = useMessagesQuery(conversation?.id);
+  const postMessageMutation = usePostMessage();
 
   const handleSendMessage = async () => {
     if (!message.trim() || !conversation) return;
 
     try {
-      await postMessage(conversation.id, message);
+      await postMessageMutation.mutateAsync({
+        conversationId: conversation.id,
+        text: message
+      });
       setMessage("");
-      
-      // Refresh messages after sending
-      const response = await getMessages(conversation.id);
-      setConversationDetail(response.conversation);
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully.",
+      });
     } catch (error) {
       console.error("Failed to send message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -60,7 +53,6 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
     return (
       <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="relative mb-8">
-          {/* Enhanced illustration */}
           <div className="w-40 h-32 bg-white rounded-2xl shadow-xl flex items-center justify-center relative border border-gray-100">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl transform rotate-12 shadow-lg"></div>
             <div className="absolute -top-3 -right-3 w-16 h-16 bg-gradient-to-br from-purple-400 to-blue-500 rounded-full opacity-80 blur-sm"></div>
@@ -87,6 +79,14 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
         <div className="text-gray-500">Loading messages...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-white">
+        <div className="text-red-500">Error loading messages</div>
       </div>
     );
   }
@@ -190,11 +190,11 @@ export const ConversationView = ({ conversation, onProfilePreview }: Conversatio
           <Button 
             size="sm" 
             onClick={handleSendMessage}
-            disabled={!message.trim()}
+            disabled={!message.trim() || postMessageMutation.isPending}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl shadow-sm"
           >
             <Send size={16} className="mr-2" />
-            Send
+            {postMessageMutation.isPending ? "Sending..." : "Send"}
           </Button>
         </div>
         
